@@ -1,4 +1,5 @@
 #include "Screen.h"
+#include <cstdio>
 
 const int SCREEN_WIDTH = 640;
 const int SCREEN_HEIGHT = 480;
@@ -58,6 +59,12 @@ int main(int argc, char *args[]) {
                      
     screen->drawLine(1, 120, 1, 360);
 
+    screen->drawCircle(320, 240, 100);
+    screen->drawCircle(0, 0, 100);
+
+    screen->drawEllipse(320, 240, 200, 50);
+    screen->drawEllipse(320, 240, 50, 200);
+    screen->drawEllipse(320, 240, 150, 200);
     screen->render();
   }
 
