@@ -1,16 +1,7 @@
-# BattleCitySDL
+# TinyRenderer
 
 * License: [MIT](https://mit-license.org/)
-* Platform: Windows/Linux/MacOS
-
-# Project Info
-
-Remake of Battle City (a.k.a. Tank1990). Written in C++11 and OpenGL using SDL2.0.
-
-# Screenshots
-![](https://github.com/luyiming/BattleCitySDL/blob/master/screenshots/screenshots_1.png)
-![](https://github.com/luyiming/BattleCitySDL/blob/master/screenshots/screenshots_2.png)
-![](https://github.com/luyiming/BattleCitySDL/blob/master/screenshots/screenshots_3.png)
+* Platform: Windows/Linux
 
 # Building Source
 
@@ -42,12 +33,13 @@ mkdir build
 cd build
 cmake .. # You can switch to other build systems, see cmake manual
 make     # the default build system on Linux is "Unix Makefiles"
-./BattleCitySDL # run the game
+./TinyRenderer # run the game
 ```
+
 ### Windows
 ```bash
 mkdir build
 cd build
 cmake .. # the default build system on Windows is Visual Studio
 ```
-Open `BattleCitySDL.sln` file in `build/` folder. You can then build and run the project in Visual Studio. The executable file should be in `build/Debug`.
+Open `TinyRenderer.sln` file in `build/` folder. You can then build and run the project in Visual Studio. The executable file should be in `build/Debug`.
