@@ -56,7 +56,9 @@ int main(int argc, char *args[]) {
     while (!quit) {
         // Handle events on queue
         while (SDL_PollEvent(&e) != 0) {
-            quit = painter.handleEvent(e, screen);
+            if (painter.handleEvent(e, screen)) {
+                quit = true;
+            }
         }
 
         glClearColor(0.f, 0.f, 0.f, 1.f);

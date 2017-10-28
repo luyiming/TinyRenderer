@@ -42,19 +42,19 @@ bool Painter::handleEvent(SDL_Event e, Screen *screen) {
         else if (e.key.keysym.sym == SDLK_1) {
             displayMode = M_Point;
             inDisplay = true;
-            printf("进入画点模式\n");
+            printf("杩涘叆鐢荤偣妯″紡\n");
             SDL_GetMouseState(&startX, &startY);
         }
         else if (e.key.keysym.sym == SDLK_2) {
             if (displayMode != M_Line)
                 inDisplay = false;
-            printf("进入画线模式\n");
+            printf("杩涘叆鐢荤嚎妯″紡\n");
             displayMode = M_Line;
         }
         else if (e.key.keysym.sym == SDLK_3) {
             if (displayMode != M_Circle)
                 inDisplay = false;
-            printf("进入画圆模式\n");
+            printf("杩涘叆鐢诲渾妯″紡\n");
             displayMode = M_Circle;
         }
         else if (e.key.keysym.sym == SDLK_c) {
