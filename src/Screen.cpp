@@ -1,7 +1,6 @@
 #ifdef _WIN32
 #include <Windows.h>
 #endif
-#include <GL\GLU.h>
 #include <SDL.h>
 #include <SDL_opengl.h>
 #include <cstdio>
@@ -47,37 +46,22 @@ bool Screen::Init() {
     // SDL_GL_SetSwapInterval(0);
     // cout << "- Disable Vsync" << endl;
 
-    GLenum error = GL_NO_ERROR;
 
     // Initialize Projection Matrix
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
 
-    // Check for error
-    error = glGetError();
-    if (error != GL_NO_ERROR) {
-        printf("Error initializing OpenGL! %s\n", gluErrorString(error));
-        return false;
-    }
-
     // Initialize Modelview Matrix
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
-
-    // Check for error
-    error = glGetError();
-    if (error != GL_NO_ERROR) {
-        printf("Error initializing OpenGL! %s\n", gluErrorString(error));
-        return false;
-    }
 
     // Initialize clear color
     glClearColor(0.f, 0.f, 0.f, 1.f);
 
     // Check for error
-    error = glGetError();
+    GLenum error = glGetError();
     if (error != GL_NO_ERROR) {
-        printf("Error initializing OpenGL! %s\n", gluErrorString(error));
+        printf("Error initializing OpenGL! %d\n", error);
         return false;
     }
 
