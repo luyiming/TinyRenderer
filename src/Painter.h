@@ -94,9 +94,18 @@ public:
     bool handleEvent(SDL_Event e, Screen *screen);
     void drawAllShapes(Screen *screen);
     void init() {
-        printf("键盘按键 1: 画点模式  2: 画线模式  3: 画圆模式  c: 清除已有图形 q: 退出\n");
-        printf("鼠标左键: 开始绘图  鼠标右键: 结束绘图\n\n");
-        printf("进入画点模式\n");
+        printf("Keyboard:\n");
+        printf("  1: Point Mode\n");
+        printf("  2: Line Mode\n");
+        printf("  3: Circle Mode\n");
+        printf("  c: Clear All\n");
+        printf("  q: Quit\n");
+
+        printf("Mouse\n");
+        printf("  Left Click:  Start Drawing\n");
+        printf("  Right Click: Stop Drawing\n");
+
+        printf("\n--- Enter Point Mode ---\n");
     }
 };
 
