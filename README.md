@@ -1,6 +1,7 @@
 # TinyRenderer
 
-* License: [MIT](https://mit-license.org/)
+* License: [MIT](https://mit-license.org/) © [Lu Yiming](https://github.com/luyiming)
+
 * Platform: Windows/Linux
 
 # Building Source

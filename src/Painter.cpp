@@ -1,16 +1,16 @@
 #include "Painter.h"
 
 void Painter::drawAllShapes(Screen *screen) {
-    for (int i = 0; i < points.size(); i++) {
+    for (size_t i = 0; i < points.size(); i++) {
         screen->drawPixel(points[i].x, screenHeight - points[i].y, points[i].color);
     }
-    for (int i = 0; i < lines.size(); i++) {
+    for (size_t i = 0; i < lines.size(); i++) {
         screen->drawLine(lines[i].p1.x, screenHeight - lines[i].p1.y, lines[i].p2.x, screenHeight - lines[i].p2.y, lines[i].color);
     }
-    for (int i = 0; i < circles.size(); i++) {
+    for (size_t i = 0; i < circles.size(); i++) {
         screen->drawCircle(circles[i].p.x, screenHeight - circles[i].p.y, circles[i].radius, circles[i].color);
     }
-    for (int i = 0; i < ellipses.size(); i++) {
+    for (size_t i = 0; i < ellipses.size(); i++) {
         screen->drawEllipse(ellipses[i].p.x, screenHeight - ellipses[i].p.y, ellipses[i].rx, ellipses[i].ry, ellipses[i].color);
     }
 
@@ -39,19 +39,19 @@ bool Painter::handleEvent(SDL_Event e, Screen *screen) {
         if (e.key.keysym.sym == SDLK_q) {
             quit = true;
         }
-        else if (e.key.keysym.sym == SDLK_1) {
+        else if (e.key.keysym.sym == SDLK_1 || e.key.keysym.sym == SDLK_KP_1) {
             displayMode = M_Point;
             inDisplay = true;
             printf("进入画点模式\n");
             SDL_GetMouseState(&startX, &startY);
         }
-        else if (e.key.keysym.sym == SDLK_2) {
+        else if (e.key.keysym.sym == SDLK_2 || e.key.keysym.sym == SDLK_KP_2) {
             if (displayMode != M_Line)
                 inDisplay = false;
             printf("进入画线模式\n");
             displayMode = M_Line;
         }
-        else if (e.key.keysym.sym == SDLK_3) {
+        else if (e.key.keysym.sym == SDLK_3 || e.key.keysym.sym == SDLK_KP_3) {
             if (displayMode != M_Circle)
                 inDisplay = false;
             printf("进入画圆模式\n");
