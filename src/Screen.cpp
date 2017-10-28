@@ -86,7 +86,7 @@ bool Screen::Init() {
 
 void Screen::drawLine(int x1, int y1, int x2, int y2, color_t color) {
     drawLineBresenham(x1, y1, x2, y2, color);
-    drawLineTrival(x1, y1, x2, y2, color);
+    // drawLineTrival(x1, y1, x2, y2, color);
 }
 
 void Screen::drawLineTrival(int x1, int y1, int x2, int y2, color_t color) {
