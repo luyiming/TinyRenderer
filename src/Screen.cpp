@@ -172,39 +172,46 @@ void Screen::drawEllipse(int x1, int y1, int rx, int ry, color_t color) {
     }
 }
 
+vec4 Screen::barycentric(vec4 A, vec4 B, vec4 C, vec4 P)
+{
+    float d00 = (B.x - A.x)*(B.x - A.x) + (B.y - A.y)*(B.y - A.y);
+    float d01 = (B.x - A.x)*(C.x - A.x) + (B.y - A.y)*(C.y - A.y);
+    float d11 = (C.x - A.x)*(C.x - A.x) + (C.y - A.y)*(C.y - A.y);
+    float d20 = (P.x - A.x)*(B.x - A.x) + (P.y - A.y)*(B.y - A.y);
+    float d21 = (P.x - A.x)*(C.x - A.x) + (P.y - A.y)*(C.y - A.y);
+    float denom = d00 * d11 - d01 * d01;
+
+    float u = (d11 * d20 - d01 * d21) / denom;
+    float v = (d00 * d21 - d01 * d20) / denom;
+    float w = 1.0f - u - v;
+
+    return vec4(u, v, w);
+}
+
 void Screen::drawTriangle(vec4 v0, vec4 v1, vec4 v2, float *zbuffer, color_t color)
 {
 
     // find bounding box
-    int x0 = v0.x, y0 = v0.y;
-    int x1 = v1.x, y1 = v1.y;
-    int x2 = v2.x, y2 = v2.y;
-    int bx0 = max(min(min(v0.x, v1.x), v2.x), 0);
-    int by0 = max(min(min(v0.y, v1.y), v2.y), 0);
-    int bx1 = min(max(max(v0.x, v1.x), v2.x), screenWidth - 1);
-    int by1 = min(max(max(v0.y, v1.y), v2.y), screenHeight - 1);
-    for (int x = bx0; x < bx1; x++) {
+    float x0 = v0.x, y0 = v0.y;
+    float x1 = v1.x, y1 = v1.y;
+    float x2 = v2.x, y2 = v2.y;
+    int bx0 = (int)(max(min(min(v0.x, v1.x), v2.x), 0));
+    int by0 = (int)(max(min(min(v0.y, v1.y), v2.y), 0));
+    int bx1 = (int)(min(max(max(v0.x, v1.x), v2.x), screenWidth - 1));
+    int by1 = (int)(min(max(max(v0.y, v1.y), v2.y), screenHeight - 1));
+    for (int x = bx0; x <= bx1; x++) {
         for (int y = by0; y <= by1; y++) {
-            // 重心坐标 barycentric
-            // P = (1-u-v)A + uB + vC
-            float d00 = (float)(x1 - x0)*(x1 - x0) + (float)(y1 - y0)*(y1 - y0);
-            float d01 = (float)(x1 - x0)*(x2 - x0) + (float)(y1 - y0)*(y2 - y0);
-            float d11 = (float)(x2 - x0)*(x2 - x0) + (float)(y2 - y0)*(y2 - y0);
-            float d20 = (float)(x - x0)*(x1 - x0) + (float)(y - y0)*(y1 - y0);
-            float d21 = (float)(x - x0)*(x2 - x0) + (float)(y - y0)*(y2 - y0);
-            float denom = d00 * d11 - d01 * d01;
+            
+            vec4 P((float)x, (float)y, 0);
 
-            float inv = (float)(y1 - y2)*(x0 - x2) + (float)(x2 - x1)*(y0 - y2);
-            float u = (d11 * d20 - d01 * d21) / denom;
-            float v = (d00 * d21 - d01 * d20) / denom;
-            float w = 1.0f - u - v;
-            if (u < 0 || v < 0 || w < 0)
+            vec4 bary = barycentric(v0, v1, v2, P);
+            if (bary.x < 0 || bary.y < 0 || bary.z < 0)
                 continue;
             
-            float z = w*v0.z + u*v1.z + v*v2.z;
+            P.z = bary.x * v0.z + bary.y * v1.z + bary.z * v2.z;
             int idx = x + y*screenWidth;
-            if (zbuffer[idx] < z) {
-                zbuffer[idx] = z;
+            if (zbuffer[idx] < P.z) {
+                zbuffer[idx] = P.z;
                 drawPixel(x, y, color);
             }
         }
@@ -256,9 +263,9 @@ void Screen::drawTriangle(vec4 v0, vec4 v1, vec4 v2, float *zbuffer, color_t col
 
 void Screen::drawTriangle(vec4 v0, vec4 v1, vec4 v2, color_t color)
 {
-    int x0 = v0.x, y0 = v0.y;
-    int x1 = v1.x, y1 = v1.y;
-    int x2 = v2.x, y2 = v2.y;
+    int x0 = (int)v0.x, y0 = (int)v0.y;
+    int x1 = (int)v1.x, y1 = (int)v1.y;
+    int x2 = (int)v2.x, y2 = (int)v2.y;
     if (y0 > y1) {
         swap(x0, x1); swap(y0, y1);
     }
@@ -277,8 +284,8 @@ void Screen::drawTriangle(vec4 v0, vec4 v1, vec4 v2, color_t color)
         float k01 = (float)(x1 - x0) / (y1 - y0);
         // 填充下三角形
         for (int y = y0; y < y1; y++) {
-            int xstart = k02*(y - y0) + x0;
-            int xstop = k01*(y - y0) + x0;
+            int xstart = (int)(k02*(y - y0) + x0);
+            int xstop = (int)(k01*(y - y0) + x0);
             if (xstart > xstop) swap(xstart, xstop);
             for (int x = xstart; x <= xstop; x++) {
                 drawPixel(x, y, color);
@@ -289,12 +296,17 @@ void Screen::drawTriangle(vec4 v0, vec4 v1, vec4 v2, color_t color)
         // 填充上三角形
         float k12 = (float)(x2 - x1) / (y2 - y1);
         for (int y = y1; y <= y2; y++) {
-            int xstart = k02*(y - y0) + x0;
-            int xstop = k12*(y - y1) + x1;
+            int xstart = (int)(k02*(y - y0) + x0);
+            int xstop = (int)(k12*(y - y1) + x1);
             if (xstart > xstop) swap(xstart, xstop);
             for (int x = xstart; x <= xstop; x++) {
                 drawPixel(x, y, color);
             }
         }
     }
+}
+
+vec4 Screen::world2screen(vec4 v)
+{
+    return vec4((v.x + 1.0f)*screenWidth / 2.0f, (v.y + 1.0f)*screenHeight / 2.0f, v.z);
 }
