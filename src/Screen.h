@@ -36,6 +36,7 @@ public:
     void drawLine(int x1, int y1, int x2, int y2, color_t color = { 1.0f, 1.0f, 1.0f });
     void drawCircle(int x1, int y1, int r, color_t color = { 1.0f, 1.0f, 1.0f });
     void drawEllipse(int x1, int y1, int rx, int ry, color_t color = { 1.0f, 1.0f, 1.0f });
+    void drawTriangle(int x0, int y0, int x1, int y1, int x2, int y2, color_t color = { 1.0f, 1.0f, 1.0f });
 
     void render() { SDL_GL_SwapWindow(currentWindow); }
 

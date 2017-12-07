@@ -41,7 +41,10 @@ int main(int argc, char *args[]) {
             glClearColor(0.f, 0.f, 0.f, 1.f);
             glClear(GL_COLOR_BUFFER_BIT);
 
-            screen->drawLine(10, 10, 100, 100);
+            screen->drawTriangle(10, 10, 100, 50, 50, 100);
+            screen->drawTriangle(10, 10, 100, 25, 100, 40, { 1.0f ,0.0f, 0.0f });
+            screen->drawTriangle(10, 10, 40, 100, 25, 100, { 0.0f ,1.0f, 0.0f });
+
 
             for (int i = 0; i< model.num_faces(); i++) {
                 std::vector<int> face = model.get_face(i);

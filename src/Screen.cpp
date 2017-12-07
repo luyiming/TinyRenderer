@@ -171,3 +171,50 @@ void Screen::drawEllipse(int x1, int y1, int rx, int ry, color_t color) {
         y--;
     }
 }
+
+void Screen::drawTriangle(int x0, int y0, int x1, int y1, int x2, int y2, color_t color)
+{
+    // 三个顶点按y轴排序
+    if (y0 > y1) {
+        swap(x0, x1); swap(y0, y1);
+    }
+    if (y0 > y2) {
+        swap(x0, x2); swap(y0, y2);
+    }
+    if (y1 > y2) {
+        swap(x1, x2); swap(y1, y2);
+    }
+
+    if (y0 == y2)
+        return;
+
+    float k02 = (float)(x2 - x0) / (y2 - y0);
+    if (y0 != y1) {
+        float k01 = (float)(x1 - x0) / (y1 - y0);
+        // 填充下三角形
+        for (int y = y0; y < y1; y++) {
+            int xstart = k02*(y - y0) + x0;
+            int xstop = k01*(y - y0) + x0;
+            if (xstart > xstop) swap(xstart, xstop);
+            for (int x = xstart; x <= xstop; x++) {
+                drawPixel(x, y, color);
+            }
+        }
+    }
+    if (y1 != y2) {
+        // 填充上三角形
+        float k12 = (float)(x2 - x1) / (y2 - y1);
+        for (int y = y1; y <= y2; y++) {
+            int xstart = k02*(y - y0) + x0;
+            int xstop = k12*(y - y1) + x1;
+            if (xstart > xstop) swap(xstart, xstop);
+            for (int x = xstart; x <= xstop; x++) {
+                drawPixel(x, y, color);
+            }
+        }
+    }
+
+    //drawLine(x0, y0, x1, y1, color);
+    //drawLine(x1, y1, x2, y2, color);
+    //drawLine(x2, y2, x0, y0, color);
+}
