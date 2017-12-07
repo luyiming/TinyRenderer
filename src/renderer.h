@@ -3,10 +3,11 @@
 
 class vec4 {
 public:
-    float x = 0.0, y = 0.0, z = 0.0, w = 0.0;
+    float x = 0.0, y = 0.0, z = 0.0, w = 1.0;
 
 public:
     vec4() {}
+    vec4(float x, float y, float z) :x(x), y(y), z(z), w(1.0) {}
     vec4(float x, float y, float z, float w) :x(x), y(y), z(z), w(w) {}
     float length();
     float dot_product(const vec4 & rhs) const; // 矢量点乘
@@ -39,13 +40,13 @@ mat44 operator*(const mat44 & lhs, const mat44 & rhs); // 矩阵乘法
 vec4 operator*(const mat44 & matrix, const vec4 & vector); // 矩阵乘向量
 
 // 0.0 <= r/g/b <= 1.0
-struct color_t { float r; float g; float b; };
+struct color_t { 
+    float r, g, b;
+    color_t(float r, float g, float b) :r(r), g(g), b(b) {}
+    color_t& operator *= (const float &f);
+};
 
-template<typename T>
-void swap(T &a, T &b) {
-    T t = a;
-    a = b;
-    b = t;
-}
+color_t operator * (color_t color, float f);
+color_t operator * (float f, color_t color);
 
 #endif // RENDERER_H

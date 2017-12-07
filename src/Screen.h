@@ -4,6 +4,7 @@
 #include <SDL.h>
 #include <SDL_opengl.h>
 #include <GL/gl.h>
+#include <iostream>
 #include "renderer.h"
 
 using namespace std;
@@ -25,6 +26,10 @@ public:
 
     // (0, 0) is bottom-left corner, (screenWidth, screenHeight) is top-right corner
     void drawPixel(int x, int y, color_t color = { 1.0f, 1.0f, 1.0f }) {
+        if (x < 0 || x > screenWidth || y < 0 || y > screenHeight) {
+            std::cerr << "pixel index out of range: " << x << ", " << y << std::endl;
+            return;
+        }
         glBegin(GL_POINTS);
         // glColor3b(, (rgb >> 8) & 0xff, rgb & 0xff);
         glColor3f(color.r, color.g, color.b);
@@ -36,7 +41,8 @@ public:
     void drawLine(int x1, int y1, int x2, int y2, color_t color = { 1.0f, 1.0f, 1.0f });
     void drawCircle(int x1, int y1, int r, color_t color = { 1.0f, 1.0f, 1.0f });
     void drawEllipse(int x1, int y1, int rx, int ry, color_t color = { 1.0f, 1.0f, 1.0f });
-    void drawTriangle(int x0, int y0, int x1, int y1, int x2, int y2, color_t color = { 1.0f, 1.0f, 1.0f });
+    void drawTriangle(vec4 v0, vec4 v1, vec4 v2, float *zbuffer, color_t color = { 1.0f, 1.0f, 1.0f });
+    void drawTriangle(vec4 v0, vec4 v1, vec4 v2, color_t color = { 1.0f, 1.0f, 1.0f });
 
     void render() { SDL_GL_SwapWindow(currentWindow); }
 

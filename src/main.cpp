@@ -4,7 +4,8 @@
 
 using namespace std;
 
-const int SCREEN_WIDTH = 640;
+//const int SCREEN_WIDTH = 640;
+const int SCREEN_WIDTH = 500;
 const int SCREEN_HEIGHT = 480;
 
 int main(int argc, char *args[]) {
@@ -41,22 +42,32 @@ int main(int argc, char *args[]) {
             glClearColor(0.f, 0.f, 0.f, 1.f);
             glClear(GL_COLOR_BUFFER_BIT);
 
-            screen->drawTriangle(10, 10, 100, 50, 50, 100);
-            screen->drawTriangle(10, 10, 100, 25, 100, 40, { 1.0f ,0.0f, 0.0f });
-            screen->drawTriangle(10, 10, 40, 100, 25, 100, { 0.0f ,1.0f, 0.0f });
+            //screen->drawTriangle(10, 10, 100, 50, 50, 100);
+            //screen->drawTriangle(10, 10, 100, 25, 100, 40, { 1.0f ,0.0f, 0.0f });
+            //screen->drawTriangle(10, 10, 40, 100, 25, 100, { 0.0f ,1.0f, 0.0f });
 
+            float *zbuffer = new float[SCREEN_HEIGHT * SCREEN_WIDTH];
+            for (int i = 0; i < SCREEN_HEIGHT * SCREEN_WIDTH; i++) zbuffer[i] = -std::numeric_limits<float>::max();
 
             for (int i = 0; i< model.num_faces(); i++) {
                 std::vector<int> face = model.get_face(i);
-                for (int j = 0; j < 3; j++) {
-                    vec4 v0 = model.get_vertex(face[j]);
-                    vec4 v1 = model.get_vertex(face[(j + 1) % 3]);
-                    int x0 = (v0.x + 1.0)*SCREEN_WIDTH / 2.0;
-                    int y0 = (v0.y + 1.0)*SCREEN_HEIGHT / 2.0;
-                    int x1 = (v1.x + 1.0)*SCREEN_WIDTH / 2.0;
-                    int y1 = (v1.y + 1.0)*SCREEN_HEIGHT / 2.0;
-                    screen->drawLine(x0, y0, x1, y1);
-                }
+                vec4 v0 = model.get_vertex(face[0]);
+                vec4 v1 = model.get_vertex(face[1]);
+                vec4 v2 = model.get_vertex(face[2]);
+
+                vec4 n = cross_product(v2 - v0, v1 - v0);
+                n.normalize();
+                float light = dot_product(n, vec4(0, 0, -1));
+
+                int x0 = int((v0.x + 1.0)*SCREEN_WIDTH / 2.0);
+                int y0 = int((v0.y + 1.0)*SCREEN_HEIGHT / 2.0);
+                int x1 = int((v1.x + 1.0)*SCREEN_WIDTH / 2.0);
+                int y1 = int((v1.y + 1.0)*SCREEN_HEIGHT / 2.0);
+                int x2 = int((v2.x + 1.0)*SCREEN_WIDTH / 2.0);
+                int y2 = int((v2.y + 1.0)*SCREEN_HEIGHT / 2.0);
+                if(light > 0)
+                    screen->drawTriangle(vec4(x0, y0, v0.z), vec4(x1, y1, v1.z), vec4(x2, y2, v2.z), zbuffer, color_t(1.0, 1.0, 1.0)*light);
+                    //screen->drawTriangle(vec4(x0, y0, v0.z), vec4(x1, y1, v1.z), vec4(x2, y2, v2.z), zbuffer, color_t((rand() % 255) / 255.0, (rand() % 255) / 255.0, (rand() % 255) / 255.0));
             }
 
             screen->render();

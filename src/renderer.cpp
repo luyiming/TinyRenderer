@@ -91,6 +91,17 @@ vec4 operator*(const mat44 & mat, const vec4 & vec)
     return result;
 }
 
+color_t operator*(color_t color, float f)
+{
+    color *= f;
+    return color;
+}
+
+color_t operator*(float f, color_t color)
+{
+    return color * f;
+}
+
 mat44 & mat44::operator*=(const float & rhs)
 {
     for (int i = 0; i < 4; i++)
@@ -154,4 +165,12 @@ void mat44::set_rotate(float x, float y, float z, float theta)
     m[3][0] = m[3][1] = m[3][2] = 0.0f;
     m[0][3] = m[1][3] = m[2][3] = 0.0f;
     m[3][3] = 1.0f;
+}
+
+color_t & color_t::operator*=(const float & f)
+{
+    r *= f;
+    g *= f;
+    b *= f;
+    return *this;
 }
