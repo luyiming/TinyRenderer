@@ -29,12 +29,12 @@ void vec4::normalize()
 
 vec4 operator+(const vec4 & lhs, const vec4 & rhs)
 {
-    return vec4(lhs.x + rhs.x, lhs.y + rhs.y, lhs.z + rhs.y, 1.0);
+    return vec4(lhs.x + rhs.x, lhs.y + rhs.y, lhs.z + rhs.z, 1.0);
 }
 
 vec4 operator-(const vec4 & lhs, const vec4 & rhs)
 {
-    return vec4(lhs.x - rhs.x, lhs.y - rhs.y, lhs.z - rhs.y, 1.0);
+    return vec4(lhs.x - rhs.x, lhs.y - rhs.y, lhs.z - rhs.z, 1.0);
 }
 
 float dot_product(const vec4 & lhs, const vec4 & rhs)
