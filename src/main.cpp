@@ -1,18 +1,20 @@
 #include "Screen.h"
 #include "model.h"
+#include "tgaimage.h"
 #include <cstdio>
 
 using namespace std;
 
 //const int SCREEN_WIDTH = 640;
-const int SCREEN_WIDTH = 500;
-const int SCREEN_HEIGHT = 480;
+const int SCREEN_WIDTH = 512;
+const int SCREEN_HEIGHT = 512;
 
 int main(int argc, char *args[]) {
     Screen *screen = new Screen(SCREEN_WIDTH, SCREEN_HEIGHT, "TinyRenderer");
     screen->Init();
     
-    Model model("D:/Projects/TinyRenderer/src/model/african_head.obj");
+    Model model("D:/Projects/TinyRenderer/src/model/african_head.obj",
+        "D:/Projects/TinyRenderer/src/model/african_head_diffuse.tga");
 
     // Main loop flag
     bool quit = false;

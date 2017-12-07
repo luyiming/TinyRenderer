@@ -40,7 +40,7 @@ mat44 operator*(const mat44 & lhs, const mat44 & rhs); // ¾ØÕó³Ë·¨
 vec4 operator*(const mat44 & matrix, const vec4 & vector); // ¾ØÕó³ËÏòÁ¿
 
 // 0.0 <= r/g/b <= 1.0
-struct color_t { 
+struct color_t {
     float r, g, b;
     color_t(float r, float g, float b) :r(r), g(g), b(b) {}
     color_t& operator *= (const float &f);
