@@ -44,7 +44,7 @@ public:
 
     // 计算点P在三角形ABC中的重心坐标, 返回值(u, v, w)，可以表示为P=uA+vB+wC
     vec4 barycentric(vec4 A, vec4 B, vec4 C, vec4 P);
-    void drawTriangle(vec4 v0, vec4 v1, vec4 v2, float *zbuffer, color_t color = { 1.0f, 1.0f, 1.0f });
+    void drawTriangle(vec4 v0, vec4 v1, vec4 v2, IShader &shader, float *zbuffer);
     void drawTriangle(vec4 v0, vec4 v1, vec4 v2, color_t color = { 1.0f, 1.0f, 1.0f });
     vec4 world2screen(vec4 v);
 

@@ -10,10 +10,10 @@ private:
     struct vertex_index_t {
         int vertex, uv, norm;
     };
-    std::vector<vec4> vertices;
-    std::vector<std::vector<vertex_index_t> > faces;
-    std::vector<vec4> norm;
-    std::vector<vec4> uv;
+    std::vector<vec4> m_vertices;
+    std::vector<std::vector<vertex_index_t> > m_faces;
+    std::vector<vec4> m_norm;
+    std::vector<vec4> m_uv;
     TGAImage diffuse_texture;
 
 public:
@@ -25,6 +25,7 @@ public:
     std::vector<int> get_face(int i);
     void load_texture(const char* filename, TGAImage &texture);
     color_t get_texture(float u, float v);
+    vec4 uv(int iface, int nthvert);
 };
 
 #endif //__MODEL_H__

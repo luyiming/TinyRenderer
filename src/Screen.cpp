@@ -181,34 +181,38 @@ vec4 Screen::barycentric(vec4 A, vec4 B, vec4 C, vec4 P)
     float d21 = (P.x - A.x)*(C.x - A.x) + (P.y - A.y)*(C.y - A.y);
     float denom = d00 * d11 - d01 * d01;
 
-    float u = (d11 * d20 - d01 * d21) / denom;
-    float v = (d00 * d21 - d01 * d20) / denom;
-    float w = 1.0f - u - v;
+    float v = (d11 * d20 - d01 * d21) / denom;
+    float w = (d00 * d21 - d01 * d20) / denom;
+    float u = 1.0f - v - w;
 
     return vec4(u, v, w);
 }
 
-void Screen::drawTriangle(vec4 v0, vec4 v1, vec4 v2, float *zbuffer, color_t color)
+void Screen::drawTriangle(vec4 v0, vec4 v1, vec4 v2, IShader &shader, float *zbuffer)
 {
-
     // find bounding box
     float x0 = v0.x, y0 = v0.y;
     float x1 = v1.x, y1 = v1.y;
     float x2 = v2.x, y2 = v2.y;
-    int bx0 = (int)(max(min(min(v0.x, v1.x), v2.x), 0));
-    int by0 = (int)(max(min(min(v0.y, v1.y), v2.y), 0));
-    int bx1 = (int)(min(max(max(v0.x, v1.x), v2.x), screenWidth - 1));
-    int by1 = (int)(min(max(max(v0.y, v1.y), v2.y), screenHeight - 1));
+    int bx0 = std::lround(max(min(min(v0.x, v1.x), v2.x), 0));
+    int by0 = std::lround(max(min(min(v0.y, v1.y), v2.y), 0));
+    int bx1 = std::lround(min(max(max(v0.x, v1.x), v2.x), screenWidth - 1));
+    int by1 = std::lround(min(max(max(v0.y, v1.y), v2.y), screenHeight - 1));
     for (int x = bx0; x <= bx1; x++) {
         for (int y = by0; y <= by1; y++) {
-            
+
             vec4 P((float)x, (float)y, 0);
 
-            vec4 bary = barycentric(v0, v1, v2, P);
-            if (bary.x < 0 || bary.y < 0 || bary.z < 0)
+            vec4 bar = barycentric(v0, v1, v2, P);
+            if (bar.x < 0 || bar.y < 0 || bar.z < 0)
                 continue;
-            
-            P.z = bary.x * v0.z + bary.y * v1.z + bary.z * v2.z;
+
+            color_t color;
+            bool discard = shader.fragment(bar, color);
+            if (discard)
+                continue;
+
+            P.z = bar.x * v0.z + bar.y * v1.z + bar.z * v2.z;
             int idx = x + y*screenWidth;
             if (zbuffer[idx] < P.z) {
                 zbuffer[idx] = P.z;
@@ -216,56 +220,14 @@ void Screen::drawTriangle(vec4 v0, vec4 v1, vec4 v2, float *zbuffer, color_t col
             }
         }
     }
-
-    // 扫描线算法
-    /*
-    // 三个顶点按y轴排序
-    if (y0 > y1) {
-        swap(x0, x1); swap(y0, y1);
-    }
-    if (y0 > y2) {
-        swap(x0, x2); swap(y0, y2);
-    }
-    if (y1 > y2) {
-        swap(x1, x2); swap(y1, y2);
-    }
-
-    if (y0 == y2)
-        return;
-
-    float k02 = (float)(x2 - x0) / (y2 - y0);
-    if (y0 != y1) {
-        float k01 = (float)(x1 - x0) / (y1 - y0);
-        // 填充下三角形
-        for (int y = y0; y < y1; y++) {
-            int xstart = k02*(y - y0) + x0;
-            int xstop = k01*(y - y0) + x0;
-            if (xstart > xstop) swap(xstart, xstop);
-            for (int x = xstart; x <= xstop; x++) {
-                drawPixel(x, y, color);
-            }
-        }
-    }
-    if (y1 != y2) {
-        // 填充上三角形
-        float k12 = (float)(x2 - x1) / (y2 - y1);
-        for (int y = y1; y <= y2; y++) {
-            int xstart = k02*(y - y0) + x0;
-            int xstop = k12*(y - y1) + x1;
-            if (xstart > xstop) swap(xstart, xstop);
-            for (int x = xstart; x <= xstop; x++) {
-                drawPixel(x, y, color);
-            }
-        }
-    }
-    */
 }
 
 void Screen::drawTriangle(vec4 v0, vec4 v1, vec4 v2, color_t color)
 {
-    int x0 = (int)v0.x, y0 = (int)v0.y;
-    int x1 = (int)v1.x, y1 = (int)v1.y;
-    int x2 = (int)v2.x, y2 = (int)v2.y;
+    // 扫描线算法
+    int x0 = std::lround(v0.x), y0 = std::lround(v0.y);
+    int x1 = std::lround(v1.x), y1 = std::lround(v1.y);
+    int x2 = std::lround(v2.x), y2 = std::lround(v2.y);
     if (y0 > y1) {
         swap(x0, x1); swap(y0, y1);
     }

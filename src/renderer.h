@@ -42,11 +42,18 @@ vec4 operator*(const mat44 & matrix, const vec4 & vector); // ¾ØÕó³ËÏòÁ¿
 // 0.0 <= r/g/b <= 1.0
 struct color_t {
     float r, g, b;
+    color_t() :r(1.0f), g(1.0f), b(1.0f) {}
     color_t(float r, float g, float b) :r(r), g(g), b(b) {}
     color_t& operator *= (const float &f);
 };
 
 color_t operator * (color_t color, float f);
 color_t operator * (float f, color_t color);
+
+struct IShader {
+    virtual ~IShader() {}
+    virtual vec4 vertex(int iface, int nthvert) = 0;
+    virtual bool fragment(vec4 bar, color_t &color) = 0;
+};
 
 #endif // RENDERER_H
