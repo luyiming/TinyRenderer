@@ -4,6 +4,9 @@
 
 * Platform: Windows/Linux
 
+# Screenshots
+![](figure/front_head_light.png)
+
 # Building Source
 
 ## Prerequisites
