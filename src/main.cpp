@@ -1,5 +1,5 @@
 #include "Screen.h"
-#include "Painter.h"
+#include "model.h"
 #include <cstdio>
 
 using namespace std;
@@ -10,10 +10,12 @@ const int SCREEN_HEIGHT = 480;
 int main(int argc, char *args[]) {
     Screen *screen = new Screen(SCREEN_WIDTH, SCREEN_HEIGHT, "TinyRenderer");
     screen->Init();
-    Painter painter;
+    
+    Model model("D:/Projects/TinyRenderer/src/model/african_head.obj");
 
     // Main loop flag
     bool quit = false;
+    bool redraw = true;
 
     // Event handler
     SDL_Event e;
@@ -21,52 +23,42 @@ int main(int argc, char *args[]) {
     // Enable text input
     SDL_StartTextInput();
 
-    painter.init();
-
-    painter.addPoint(Point(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2));
-
-    painter.addLine(Line(Point(10, 120), Point(160, 480)));
-    painter.addLine(Line(Point(10, 120), Point(160, 420)));
-    painter.addLine(Line(Point(10, 120), Point(160, 360)));
-    painter.addLine(Line(Point(10, 120), Point(160, 300)));
-    painter.addLine(Line(Point(10, 120), Point(160, 240)));
-    painter.addLine(Line(Point(10, 120), Point(160, 180)));
-    painter.addLine(Line(Point(10, 120), Point(160, 120)));
-    painter.addLine(Line(Point(10, 120), Point(160, 60)));
-    painter.addLine(Line(Point(10, 120), Point(160, 0)));
-    painter.addLine(Line(Point(10, 360), Point(160, 480)));
-    painter.addLine(Line(Point(10, 360), Point(160, 420)));
-    painter.addLine(Line(Point(10, 360), Point(160, 360)));
-    painter.addLine(Line(Point(10, 360), Point(160, 300)));
-    painter.addLine(Line(Point(10, 360), Point(160, 240)));
-    painter.addLine(Line(Point(10, 360), Point(160, 180)));
-    painter.addLine(Line(Point(10, 360), Point(160, 120)));
-    painter.addLine(Line(Point(10, 360), Point(160, 60)));
-    painter.addLine(Line(Point(10, 360), Point(160, 0)));
-    painter.addLine(Line(Point(10, 120), Point(10, 360), COLOR_GREEN));
-    painter.addLine(Line(Point(10, 240), Point(320, 240)));
-
-    painter.addCircle(Circle(Point(320, 240), 100));
-
-    painter.addEllipse(Ellipsed(Point(320, 240), 200, 50, COLOR_BLUE));
-    painter.addEllipse(Ellipsed(Point(320, 240), 50, 200));
-    painter.addEllipse(Ellipsed(Point(320, 240), 150, 200));
-
     // While application is running
     while (!quit) {
         // Handle events on queue
         while (SDL_PollEvent(&e) != 0) {
-            if (painter.handleEvent(e, screen)) {
+            if (e.type == SDL_QUIT) {
                 quit = true;
+            }
+            else if (e.type == SDL_KEYDOWN) {
+                if (e.key.keysym.sym == SDLK_q) {
+                    quit = true;
+                }
             }
         }
 
-        glClearColor(0.f, 0.f, 0.f, 1.f);
-        glClear(GL_COLOR_BUFFER_BIT);
+        if (redraw) {
+            glClearColor(0.f, 0.f, 0.f, 1.f);
+            glClear(GL_COLOR_BUFFER_BIT);
 
-        painter.drawAllShapes(screen);
+            screen->drawLine(10, 10, 100, 100);
 
-        screen->render();
+            for (int i = 0; i< model.num_faces(); i++) {
+                std::vector<int> face = model.get_face(i);
+                for (int j = 0; j < 3; j++) {
+                    vec4 v0 = model.get_vertex(face[j]);
+                    vec4 v1 = model.get_vertex(face[(j + 1) % 3]);
+                    int x0 = (v0.x + 1.0)*SCREEN_WIDTH / 2.0;
+                    int y0 = (v0.y + 1.0)*SCREEN_HEIGHT / 2.0;
+                    int x1 = (v1.x + 1.0)*SCREEN_WIDTH / 2.0;
+                    int y1 = (v1.y + 1.0)*SCREEN_HEIGHT / 2.0;
+                    screen->drawLine(x0, y0, x1, y1);
+                }
+            }
+
+            screen->render();
+            redraw = false;
+        }
     }
 
     // Disable text input
