@@ -6,6 +6,7 @@
 
 # Screenshots
 ![](figure/front_head_light.png)
+![](figure/front_head_diffuse_texture.png)
 
 # Building Source
 
