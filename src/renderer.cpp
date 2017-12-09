@@ -1,5 +1,7 @@
 #include "renderer.h"
 #include <cmath>
+#include <cstdio>
+#include <cassert>
 
 float vec4::length()
 {
@@ -35,6 +37,21 @@ void vec4::homogenize()
         y *= rhw;
         z *= rhw;
         w = 1.0f;
+    }
+}
+
+float & vec4::operator[](int i)
+{
+    switch (i)
+    {
+    case 0: return x;
+    case 1: return y;
+    case 2: return z;
+    case 3: return w;
+    default: 
+        printf("index out of range %d\n", i);
+        assert(0);
+        return x;
     }
 }
 
@@ -233,4 +250,23 @@ mat44 viewport(int x, int y, int w, int h)
     m.m[1][1] = h / 2.f;
     m.m[2][2] = 255.0f / 2.f;
     return m;
+}
+
+mat44 lookat(vec4 eye, vec4 center, vec4 up) {
+    vec4 z = eye - center;
+    z.normalize();
+    vec4 x = cross_product(up, z);
+    x.normalize();
+    vec4 y = cross_product(z, x);
+    y.normalize();
+    mat44 Minv, Tr;
+    Minv.set_identity();
+    Tr.set_identity();
+    for (int i = 0; i < 3; i++) {
+        Minv.m[0][i] = x[i];
+        Minv.m[1][i] = y[i];
+        Minv.m[2][i] = z[i];
+        Tr.m[i][3] = -center[i];
+    }
+    return Minv * Tr;
 }

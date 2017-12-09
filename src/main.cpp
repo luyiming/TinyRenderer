@@ -45,7 +45,7 @@ struct LightShader : public IShader {
     ~LightShader() {}
 };
 
-float camera = 5.0f;
+float theta = 0, radius = 5;
 
 struct TextureShader : public IShader {
     Model &model;
@@ -55,8 +55,9 @@ struct TextureShader : public IShader {
     texcoord_t varying_uv[3];
     vec4 varying_norm[3];
 
-    mat44 ViewPort;
+    mat44 ModelView;
     mat44 Projection;
+    mat44 ViewPort;
 
     TextureShader(Model &model) :model(model) {
         ViewPort = viewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
@@ -65,8 +66,14 @@ struct TextureShader : public IShader {
     vec4 vertex(int iface, int nthvert) {
         world_coords[nthvert] = model.get_vertex(model.get_face(iface)[nthvert]);
 
+        ModelView = lookat(vec4(radius * sinf(theta), 0, radius * cosf(theta)),
+            vec4(0, 0, 0),
+            vec4(0, 1, 0));
+
+        world_coords[nthvert] = ModelView * world_coords[nthvert];
+
         Projection.set_identity();
-        Projection.m[3][2] = -1.0f / camera;
+        Projection.m[3][2] = -1.0f / radius;
         world_coords[nthvert] = Projection * world_coords[nthvert];
         world_coords[nthvert].homogenize();
 
@@ -134,13 +141,23 @@ int main(int argc, char *args[]) {
                     quit = true;
                 }
                 else if (e.key.keysym.sym == SDLK_UP) {
-                    camera -= 0.2f;
-                    printf("camera at %f\n", camera);
+                    radius -= 0.2f;
+                    printf("radius at %f\n", radius);
                     redraw = true;
                 }
                 else if (e.key.keysym.sym == SDLK_DOWN) {
-                    camera += 0.2f;
-                    printf("camera at %f\n", camera);
+                    radius += 3.1415926f / 18.0f;
+                    printf("radius at %f\n", radius);
+                    redraw = true;
+                }
+                else if (e.key.keysym.sym == SDLK_LEFT) {
+                    theta -= 3.1415926f / 18.0f;
+                    printf("theta at %f\n", theta);
+                    redraw = true;
+                }
+                else if (e.key.keysym.sym == SDLK_RIGHT) {
+                    theta += 0.2f;
+                    printf("theta at %f\n", theta);
                     redraw = true;
                 }
             }

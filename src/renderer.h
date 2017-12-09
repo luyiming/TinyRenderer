@@ -15,6 +15,7 @@ public:
     void normalize(); // 矢量归一化
     void homogenize(); // 将齐次坐标归一
 
+    float& operator[](int i);
     vec4& operator*=(const float rhs);
 
     vec4& operator*=(const vec4& rhs); // 逐元素乘法
@@ -76,5 +77,6 @@ struct IShader {
 };
 
 mat44 viewport(int x, int y, int w, int h);
+mat44 lookat(vec4 eye, vec4 center, vec4 up);
 
 #endif // RENDERER_H
