@@ -70,14 +70,11 @@ struct TextureShader : public IShader {
             vec4(0, 0, 0),
             vec4(0, 1, 0));
 
-        world_coords[nthvert] = ModelView * world_coords[nthvert];
-
         Projection.set_identity();
         Projection.m[3][2] = -1.0f / radius;
-        world_coords[nthvert] = Projection * world_coords[nthvert];
-        world_coords[nthvert].homogenize();
 
-        screen_coords[nthvert] = ViewPort * world_coords[nthvert];
+        screen_coords[nthvert] = ViewPort * Projection * ModelView * world_coords[nthvert];
+        screen_coords[nthvert].homogenize();
 
         varying_uv[nthvert] = model.uv(iface, nthvert);
         varying_norm[nthvert] = model.norm(iface, nthvert);
