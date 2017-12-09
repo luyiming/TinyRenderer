@@ -194,6 +194,15 @@ mat44 mat44::identity()
     return mat;
 }
 
+mat44 mat44::zero()
+{
+    mat44 mat;
+    for (int i = 0; i < 4; i++)
+        for (int j = 0; j < 4; j++)
+            mat.m[i][j] = 0.0f;
+    return mat;
+}
+
 void mat44::set_identity()
 {
     m[0][0] = m[1][1] = m[2][2] = m[3][3] = 1.0f;
@@ -288,16 +297,28 @@ mat44 lookat(vec4 eye, vec4 center, vec4 up) {
     return Minv * Tr;
 }
 
-mat44 ortho(float left, float right, float top, float bottom, float Near, float Far)
+mat44 ortho(float left, float right, float top, float bottom, float znear, float zfar)
 {
     mat44 mat;
     mat.set_identity();
     mat.m[0][0] = 2.0f / (right - left);
     mat.m[1][1] = 2.0f / (top - bottom);
-    mat.m[2][2] = -2.0f / (Far - Near); // we use right hand coordinate system, so Far < Near
+    mat.m[2][2] = -2.0f / (zfar - znear); // we use right hand coordinate system, so Far < Near
     mat.m[0][3] = -(right + left) / (right - left);
     mat.m[1][3] = -(top + bottom) / (top - bottom);
-    mat.m[2][3] = -(Far + Near) / (Far - Near);
+    mat.m[2][3] = -(zfar + znear) / (zfar - znear);
 
+    return mat;
+}
+
+mat44 perspective(float fovy, float aspect, float znear, float zfar)
+{
+    mat44 mat = mat44::zero();
+    float fax = 1.0f / (float)std::tan(fovy * 0.5f);
+    mat.m[0][0] = (float)(fax / aspect);
+    mat.m[1][1] = (float)(fax);
+    mat.m[2][2] = zfar / (zfar - znear);
+    mat.m[3][2] = -znear * zfar / (zfar - znear);
+    mat.m[2][3] = 1.0f;
     return mat;
 }

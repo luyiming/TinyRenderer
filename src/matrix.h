@@ -35,6 +35,7 @@ public:
 
 public:
     static mat44 identity();
+    static mat44 zero();
 
 public:
     void set_identity();
@@ -46,17 +47,18 @@ public:
     mat44& operator*=(const float &rhs);
 };
 
-mat44 operator+(mat44 lhs, const mat44 & rhs); // ¾ØÕó¼Ó·¨
-mat44 operator-(mat44 lhs, const mat44 & rhs); // ¾ØÕó¼õ·¨
-mat44 operator*(const mat44 & lhs, const mat44 & rhs); // ¾ØÕó³Ë·¨
-vec4 operator*(const mat44 & matrix, const vec4 & vector); // ¾ØÕó³ËÏòÁ¿
+mat44 operator+(mat44 lhs, const mat44 & rhs);
+mat44 operator-(mat44 lhs, const mat44 & rhs);
+mat44 operator*(const mat44 & lhs, const mat44 & rhs);
+vec4 operator*(const mat44 & matrix, const vec4 & vector);
 
 
-mat44 translate(float x, float y, float z);             // Æ½ÒÆ±ä»»¾ØÕó
-mat44 scale(float x, float y, float z);                 // Ëõ·Å¾ØÕó
-mat44 rotate(float x, float y, float z, float theta);   // Ğı×ª¾ØÕó
+mat44 translate(float x, float y, float z);
+mat44 scale(float x, float y, float z);
+mat44 rotate(float x, float y, float z, float theta);
 mat44 viewport(int x, int y, int w, int h);
 mat44 lookat(vec4 eye, vec4 center, vec4 up);
-mat44 ortho(float left, float right, float top, float bottom, float Near, float Far);
+mat44 ortho(float left, float right, float top, float bottom, float znear, float zfar);
+mat44 perspective(float fovy, float aspect, float znear, float zfar);
 
 #endif // __MATRIX_H__
