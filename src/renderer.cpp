@@ -27,9 +27,34 @@ void vec4::normalize()
     }
 }
 
+void vec4::homogenize()
+{
+    if (w != 0) {
+        float rhw = 1.0f / w;
+        x *= rhw;
+        y *= rhw;
+        z *= rhw;
+        w = 1.0f;
+    }
+}
+
+vec4 & vec4::operator*=(const vec4 & rhs)
+{
+    x *= rhs.x;
+    y *= rhs.y;
+    z *= rhs.z;
+    return *this;
+}
+
 vec4 operator+(const vec4 & lhs, const vec4 & rhs)
 {
     return vec4(lhs.x + rhs.x, lhs.y + rhs.y, lhs.z + rhs.z, 1.0);
+}
+
+vec4 operator*(vec4 lhs, const vec4 & rhs)
+{
+    lhs *= rhs;
+    return lhs;
 }
 
 vec4 operator-(const vec4 & lhs, const vec4 & rhs)

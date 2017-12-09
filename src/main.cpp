@@ -45,17 +45,26 @@ struct LightShader : public IShader {
     ~LightShader() {}
 };
 
+float camera = 5.0f;
+
 struct TextureShader : public IShader {
     Model &model;
     color_t color;
     vec4 screen_coords[3];
     vec4 world_coords[3];
-    vec4 varying_uv[3];
+    texcoord_t varying_uv[3];
 
     TextureShader(Model &model) :model(model) {}
 
     vec4 vertex(int iface, int nthvert) {
         world_coords[nthvert] = model.get_vertex(model.get_face(iface)[nthvert]);
+
+        mat44 projection;
+        projection.set_identity();
+        projection.m[3][2] = -1.0f / camera;
+        world_coords[nthvert] = projection * world_coords[nthvert];
+        world_coords[nthvert].homogenize();
+
         screen_coords[nthvert] = world2screen(world_coords[nthvert]);
 
         varying_uv[nthvert] = model.uv(iface, nthvert);
@@ -65,10 +74,21 @@ struct TextureShader : public IShader {
     }
 
     bool fragment(vec4 bar, color_t &color) override {
-        float u = bar.x * varying_uv[0].x + bar.y * varying_uv[1].x + bar.z * varying_uv[2].x;
-        float v = bar.x * varying_uv[0].y + bar.y * varying_uv[1].y + bar.z * varying_uv[2].y;
+        float u = bar.x * varying_uv[0].u + bar.y * varying_uv[1].u + bar.z * varying_uv[2].u;
+        float v = bar.x * varying_uv[0].v + bar.y * varying_uv[1].v + bar.z * varying_uv[2].v;
         color = model.get_texture(u, v);
-        return false;
+
+        vec4 light_vec(0, 0, -1);
+
+        vec4 norm_vec = cross_product(world_coords[2] - world_coords[0], world_coords[1] - world_coords[0]);
+        norm_vec.normalize();
+        float intensity = dot_product(norm_vec, light_vec);
+
+        color *= intensity;
+
+        return intensity < 0;
+
+        //return false;
     }
 
     ~TextureShader() {}
@@ -104,6 +124,16 @@ int main(int argc, char *args[]) {
             else if (e.type == SDL_KEYDOWN) {
                 if (e.key.keysym.sym == SDLK_q) {
                     quit = true;
+                }
+                else if (e.key.keysym.sym == SDLK_UP) {
+                    camera -= 0.2f;
+                    printf("camera at %f\n", camera);
+                    redraw = true;
+                }
+                else if (e.key.keysym.sym == SDLK_DOWN) {
+                    camera += 0.2f;
+                    printf("camera at %f\n", camera);
+                    redraw = true;
                 }
             }
         }

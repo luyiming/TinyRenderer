@@ -31,9 +31,9 @@ Model::Model(const char *model_file, const char* diffuse_map) {
         }
         else if (!line.compare(0, 3, "vt ")) {
             iss >> trash >> trash;
-            vec4 uv_;
-            iss >> uv_.x >> uv_.y;
-            m_uv.push_back(uv_);
+            texcoord_t texcoord;
+            iss >> texcoord.u >> texcoord.v;
+            m_uv.push_back(texcoord);
         }
         else if (!line.compare(0, 2, "f ")) {
             std::vector<vertex_index_t> f;
@@ -85,7 +85,7 @@ color_t Model::get_texture(float u, float v)
     return color_t(color.R() / 255.0f, color.G() / 255.0f, color.B() / 255.0f);
 }
 
-vec4 Model::uv(int iface, int nthvert)
+texcoord_t Model::uv(int iface, int nthvert)
 {
     return m_uv[m_faces[iface][nthvert].uv];
 }

@@ -13,7 +13,7 @@ private:
     std::vector<vec4> m_vertices;
     std::vector<std::vector<vertex_index_t> > m_faces;
     std::vector<vec4> m_norm;
-    std::vector<vec4> m_uv;
+    std::vector<texcoord_t> m_uv;
     TGAImage diffuse_texture;
 
 public:
@@ -25,7 +25,7 @@ public:
     std::vector<int> get_face(int i);
     void load_texture(const char* filename, TGAImage &texture);
     color_t get_texture(float u, float v);
-    vec4 uv(int iface, int nthvert);
+    texcoord_t uv(int iface, int nthvert);
 };
 
 #endif //__MODEL_H__

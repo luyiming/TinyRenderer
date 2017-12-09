@@ -3,19 +3,23 @@
 
 class vec4 {
 public:
-    float x = 0.0, y = 0.0, z = 0.0, w = 1.0;
+    float x, y, z, w;
 
 public:
-    vec4() {}
+    vec4() :x(0.0f), y(0.0f), z(0.0f), w(1.0f) {}
     vec4(float x, float y, float z) :x(x), y(y), z(z), w(1.0) {}
     vec4(float x, float y, float z, float w) :x(x), y(y), z(z), w(w) {}
     float length();
     float dot_product(const vec4 & rhs) const; // 矢量点乘
     vec4 cross_product(const vec4 & rhs) const; // 矢量叉乘
     void normalize(); // 矢量归一化
+    void homogenize(); // 将齐次坐标归一
+
+    vec4& operator*=(const vec4& rhs); // 逐元素乘法
 };
 
 vec4 operator+(const vec4 & lhs, const vec4 & rhs);
+vec4 operator*(vec4 lhs, const vec4 & rhs);
 vec4 operator-(const vec4 & lhs, const vec4 & rhs);
 float dot_product(const vec4 & lhs, const vec4 & rhs);
 vec4 cross_product(const vec4 & lhs, const vec4 & rhs);
@@ -49,6 +53,17 @@ struct color_t {
 
 color_t operator * (color_t color, float f);
 color_t operator * (float f, color_t color);
+
+struct texcoord_t { 
+    float u, v; 
+};
+
+struct vertex_t { 
+    vec4 pos; 
+    texcoord_t tex; 
+    color_t color; 
+    vec4 norm; 
+};
 
 struct IShader {
     virtual ~IShader() {}
