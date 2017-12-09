@@ -1,52 +1,8 @@
 #ifndef RENDERER_H
 #define RENDERER_H
 
-class vec4 {
-public:
-    float x, y, z, w;
-
-public:
-    vec4() :x(0.0f), y(0.0f), z(0.0f), w(1.0f) {}
-    vec4(float x, float y, float z) :x(x), y(y), z(z), w(1.0) {}
-    vec4(float x, float y, float z, float w) :x(x), y(y), z(z), w(w) {}
-    float length();
-    float dot_product(const vec4 & rhs) const; // 矢量点乘
-    vec4 cross_product(const vec4 & rhs) const; // 矢量叉乘
-    void normalize(); // 矢量归一化
-    void homogenize(); // 将齐次坐标归一
-
-    float& operator[](int i);
-    vec4& operator*=(const float rhs);
-
-    vec4& operator*=(const vec4& rhs); // 逐元素乘法
-};
-
-vec4 operator+(const vec4 & lhs, const vec4 & rhs);
-vec4 operator*(vec4 lhs, const vec4 & rhs);
-vec4 operator*(const float lhs, vec4 rhs);
-vec4 operator*(vec4 lhs, const float rhs);
-vec4 operator-(const vec4 & lhs, const vec4 & rhs);
-float dot_product(const vec4 & lhs, const vec4 & rhs);
-vec4 cross_product(const vec4 & lhs, const vec4 & rhs);
-
-class mat44 {
-public:
-    float m[4][4];
-
-public:
-    mat44& operator *= (const float &rhs);
-    void set_identity();
-    void set_zero();
-    void set_translate(float x, float y, float z); // 平移变换矩阵
-    void set_scale(float x, float y, float z); // 缩放矩阵
-    void set_rotate(float x, float y, float z, float theta); // 旋转矩阵
-};
-
-mat44 operator+(const mat44 & lhs, const mat44 & rhs); // 矩阵加法
-mat44 operator-(const mat44 & lhs, const mat44 & rhs); // 矩阵减法
-mat44 operator*(const mat44 & lhs, const mat44 & rhs); // 矩阵乘法
-
-vec4 operator*(const mat44 & matrix, const vec4 & vector); // 矩阵乘向量
+#include "matrix.h"
+#include <vector>
 
 // 0.0 <= r/g/b <= 1.0
 struct color_t {
@@ -64,19 +20,31 @@ struct texcoord_t {
 };
 
 struct vertex_t { 
-    vec4 pos; 
-    texcoord_t tex; 
-    color_t color; 
+    vec4 pos;
+    bool use_tex;
+    texcoord_t tex;
+    color_t color;
     vec4 norm; 
+};
+
+struct device_t {
+    int width, height;
+    float *zbuffer;
 };
 
 struct IShader {
     virtual ~IShader() {}
-    virtual vec4 vertex(int iface, int nthvert) = 0;
     virtual bool fragment(vec4 bar, color_t &color) = 0;
 };
 
-mat44 viewport(int x, int y, int w, int h);
-mat44 lookat(vec4 eye, vec4 center, vec4 up);
+typedef void (*draw_pixel_fn_type)(int x, int y, color_t color);
+extern draw_pixel_fn_type draw_pixel_fn;
+
+// 计算点P在三角形ABC中的重心坐标, 返回值(u, v, w)，可以表示为P=uA+vB+wC
+vec4 barycentric(vec4 A, vec4 B, vec4 C, vec4 P);
+
+void draw_triangle(vec4 v0, vec4 v1, vec4 v2, IShader &shader, device_t &device);
+
+bool clip_vertices(vec4 &v);
 
 #endif // RENDERER_H

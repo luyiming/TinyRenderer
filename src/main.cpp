@@ -9,26 +9,9 @@ using namespace std;
 const int SCREEN_WIDTH = 512;
 const int SCREEN_HEIGHT = 512;
 
-vec4 world2screen(vec4 v)
-{
-    return vec4((v.x + 1.0f)*SCREEN_WIDTH / 2.0f, (v.y + 1.0f)*SCREEN_HEIGHT / 2.0f, v.z);
-}
-
 struct LightShader : public IShader {
-    Model &model;
-    color_t color;
-    vec4 screen_coords[3];
+
     vec4 world_coords[3];
-
-    LightShader(Model &model) :model(model) {}
-
-    vec4 vertex(int iface, int nthvert) {
-        world_coords[nthvert] = model.get_vertex(model.get_face(iface)[nthvert]);
-        screen_coords[nthvert] = world2screen(world_coords[nthvert]);
-
-        color = color_t((rand() % 255) / 255.0f, (rand() % 255) / 255.0f, (rand() % 255) / 255.0f);
-        return screen_coords[nthvert];
-    }
 
     bool fragment(vec4 bar, color_t &color) override {
         vec4 light_vec(0, 0, -1);
@@ -45,43 +28,13 @@ struct LightShader : public IShader {
     ~LightShader() {}
 };
 
-float theta = 0, radius = 5;
 
 struct TextureShader : public IShader {
     Model &model;
-    color_t color;
-    vec4 screen_coords[3];
-    vec4 world_coords[3];
     texcoord_t varying_uv[3];
     vec4 varying_norm[3];
 
-    mat44 ModelView;
-    mat44 Projection;
-    mat44 ViewPort;
-
-    TextureShader(Model &model) :model(model) {
-        ViewPort = viewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
-    }
-
-    vec4 vertex(int iface, int nthvert) {
-        world_coords[nthvert] = model.get_vertex(model.get_face(iface)[nthvert]);
-
-        ModelView = lookat(vec4(radius * sinf(theta), 0, radius * cosf(theta)),
-            vec4(0, 0, 0),
-            vec4(0, 1, 0));
-
-        Projection.set_identity();
-        Projection.m[3][2] = -1.0f / radius;
-
-        screen_coords[nthvert] = ViewPort * Projection * ModelView * world_coords[nthvert];
-        screen_coords[nthvert].homogenize();
-
-        varying_uv[nthvert] = model.uv(iface, nthvert);
-        varying_norm[nthvert] = model.norm(iface, nthvert);
-
-        color = color_t((rand() % 255) / 255.0f, (rand() % 255) / 255.0f, (rand() % 255) / 255.0f);
-        return screen_coords[nthvert];
-    }
+    TextureShader(Model &model) :model(model) { }
 
     bool fragment(vec4 bar, color_t &color) override {
         float u = bar.x * varying_uv[0].u + bar.y * varying_uv[1].u + bar.z * varying_uv[2].u;
@@ -91,7 +44,6 @@ struct TextureShader : public IShader {
         vec4 light_vec(0, 0, 1);
 
         vec4 norm_vec = bar.x * varying_norm[0] + bar.y * varying_norm[1] + bar.z * varying_norm[2];
-        //vec4 norm_vec = cross_product(world_coords[2] - world_coords[0], world_coords[1] - world_coords[0]);
         norm_vec.normalize();
         float intensity = dot_product(norm_vec, light_vec);
 
@@ -125,6 +77,9 @@ int main(int argc, char *args[]) {
 
     // Enable text input
     SDL_StartTextInput();
+
+
+    float theta = 0, radius = 5;
 
     // While application is running
     while (!quit) {
@@ -164,18 +119,29 @@ int main(int argc, char *args[]) {
             glClearColor(0.f, 0.f, 0.f, 1.f);
             glClear(GL_COLOR_BUFFER_BIT);
 
+            mat44 ModelView = lookat(vec4(radius * sinf(theta), 0, radius * cosf(theta)), vec4(0, 0, 0), vec4(0, 1, 0));
+            mat44 Projection = mat44::identity();
+            Projection.m[3][2] = -1.0f / radius;
+            mat44 Viewport = viewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
+
             float *zbuffer = new float[SCREEN_HEIGHT * SCREEN_WIDTH];
             for (int i = 0; i < SCREEN_HEIGHT * SCREEN_WIDTH; i++) zbuffer[i] = -std::numeric_limits<float>::max();
 
             for (int i = 0; i < model.num_faces(); i++) {
-                std::vector<int> face = model.get_face(i);
-                for (int j = 0; j < 3; j++) {
-                    shader.vertex(i, j);
+                std::vector<vertex_t> vertices = model.get_face(i);
+                std::vector<vec4> screen_coords;
+                for (int j = 0; j < (int)vertices.size(); j++) {
+                    vec4 v = (Projection * ModelView * vertices[j].pos).homogenize();
+                    if (clip_vertices(v) == true)
+                        goto stop;
+                    v = Viewport * v;
+                    screen_coords.push_back(v);
+                    shader.varying_norm[j] = vertices[j].norm;
+                    shader.varying_uv[j] = vertices[j].tex;
                 }
 
-                screen->drawTriangle(shader.screen_coords[0], shader.screen_coords[1], shader.screen_coords[2], shader, zbuffer);
-                //screen->drawTriangle(vec4(x0, y0, v0.z), vec4(x1, y1, v1.z), vec4(x2, y2, v2.z), zbuffer, color_t((rand() % 255) / 255.0, (rand() % 255) / 255.0, (rand() % 255) / 255.0));
-
+                screen->drawTriangle(screen_coords[0], screen_coords[1], screen_coords[2], shader, zbuffer);
+            stop:;
             }
 
             screen->render();

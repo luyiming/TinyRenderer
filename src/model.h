@@ -16,17 +16,15 @@ private:
     std::vector<texcoord_t> m_uv;
     TGAImage diffuse_texture;
 
+    void load_texture(const char* filename, TGAImage &texture);
+
 public:
     Model(const char *model_file, const char* diffuse_map);
     ~Model();
     int num_vertices();
     int num_faces();
-    vec4 get_vertex(int i);
-    std::vector<int> get_face(int i);
-    void load_texture(const char* filename, TGAImage &texture);
+    std::vector<vertex_t> get_face(int i);
     color_t get_texture(float u, float v);
-    texcoord_t uv(int iface, int nthvert);
-    vec4 norm(int iface, int nthvert);
 };
 
 #endif //__MODEL_H__

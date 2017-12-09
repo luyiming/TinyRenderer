@@ -65,10 +65,15 @@ int Model::num_faces() {
     return (int)m_faces.size();
 }
 
-std::vector<int> Model::get_face(int i) {
-    std::vector<int> res;
+std::vector<vertex_t> Model::get_face(int i) {
+    std::vector<vertex_t> res;
+    vertex_t vertex;
     for (int j = 0; j < (int)m_faces[i].size(); j++) {
-        res.push_back(m_faces[i][j].vertex);
+        vertex.pos = m_vertices[m_faces[i][j].vertex];
+        vertex.norm = m_norm[m_faces[i][j].norm];
+        vertex.tex = m_uv[m_faces[i][j].uv];
+        vertex.use_tex = true;
+        res.push_back(vertex);
     }
     return res;
 }
@@ -83,19 +88,5 @@ color_t Model::get_texture(float u, float v)
 {
     TGAColor color = diffuse_texture.get(std::lround(u * diffuse_texture.get_width()), std::lround(v * diffuse_texture.get_height()));
     return color_t(color.R() / 255.0f, color.G() / 255.0f, color.B() / 255.0f);
-}
-
-texcoord_t Model::uv(int iface, int nthvert)
-{
-    return m_uv[m_faces[iface][nthvert].uv];
-}
-
-vec4 Model::norm(int iface, int nthvert)
-{
-    return m_norm[m_faces[iface][nthvert].norm];
-}
-
-vec4 Model::get_vertex(int i) {
-    return m_vertices[i];
 }
 
