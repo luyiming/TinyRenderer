@@ -268,7 +268,3 @@ void Screen::drawTriangle(vec4 v0, vec4 v1, vec4 v2, color_t color)
     }
 }
 
-vec4 Screen::world2screen(vec4 v)
-{
-    return vec4((v.x + 1.0f)*screenWidth / 2.0f, (v.y + 1.0f)*screenHeight / 2.0f, v.z);
-}

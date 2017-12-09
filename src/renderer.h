@@ -15,11 +15,15 @@ public:
     void normalize(); // 矢量归一化
     void homogenize(); // 将齐次坐标归一
 
+    vec4& operator*=(const float rhs);
+
     vec4& operator*=(const vec4& rhs); // 逐元素乘法
 };
 
 vec4 operator+(const vec4 & lhs, const vec4 & rhs);
 vec4 operator*(vec4 lhs, const vec4 & rhs);
+vec4 operator*(const float lhs, vec4 rhs);
+vec4 operator*(vec4 lhs, const float rhs);
 vec4 operator-(const vec4 & lhs, const vec4 & rhs);
 float dot_product(const vec4 & lhs, const vec4 & rhs);
 vec4 cross_product(const vec4 & lhs, const vec4 & rhs);
@@ -70,5 +74,7 @@ struct IShader {
     virtual vec4 vertex(int iface, int nthvert) = 0;
     virtual bool fragment(vec4 bar, color_t &color) = 0;
 };
+
+mat44 viewport(int x, int y, int w, int h);
 
 #endif // RENDERER_H

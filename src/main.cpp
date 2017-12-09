@@ -53,21 +53,27 @@ struct TextureShader : public IShader {
     vec4 screen_coords[3];
     vec4 world_coords[3];
     texcoord_t varying_uv[3];
+    vec4 varying_norm[3];
 
-    TextureShader(Model &model) :model(model) {}
+    mat44 ViewPort;
+    mat44 Projection;
+
+    TextureShader(Model &model) :model(model) {
+        ViewPort = viewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
+    }
 
     vec4 vertex(int iface, int nthvert) {
         world_coords[nthvert] = model.get_vertex(model.get_face(iface)[nthvert]);
 
-        mat44 projection;
-        projection.set_identity();
-        projection.m[3][2] = -1.0f / camera;
-        world_coords[nthvert] = projection * world_coords[nthvert];
+        Projection.set_identity();
+        Projection.m[3][2] = -1.0f / camera;
+        world_coords[nthvert] = Projection * world_coords[nthvert];
         world_coords[nthvert].homogenize();
 
-        screen_coords[nthvert] = world2screen(world_coords[nthvert]);
+        screen_coords[nthvert] = ViewPort * world_coords[nthvert];
 
         varying_uv[nthvert] = model.uv(iface, nthvert);
+        varying_norm[nthvert] = model.norm(iface, nthvert);
 
         color = color_t((rand() % 255) / 255.0f, (rand() % 255) / 255.0f, (rand() % 255) / 255.0f);
         return screen_coords[nthvert];
@@ -78,17 +84,19 @@ struct TextureShader : public IShader {
         float v = bar.x * varying_uv[0].v + bar.y * varying_uv[1].v + bar.z * varying_uv[2].v;
         color = model.get_texture(u, v);
 
-        vec4 light_vec(0, 0, -1);
+        vec4 light_vec(0, 0, 1);
 
-        vec4 norm_vec = cross_product(world_coords[2] - world_coords[0], world_coords[1] - world_coords[0]);
+        vec4 norm_vec = bar.x * varying_norm[0] + bar.y * varying_norm[1] + bar.z * varying_norm[2];
+        //vec4 norm_vec = cross_product(world_coords[2] - world_coords[0], world_coords[1] - world_coords[0]);
         norm_vec.normalize();
         float intensity = dot_product(norm_vec, light_vec);
 
+        if (intensity < 0)
+            intensity = 0;
+
         color *= intensity;
 
-        return intensity < 0;
-
-        //return false;
+        return false;
     }
 
     ~TextureShader() {}

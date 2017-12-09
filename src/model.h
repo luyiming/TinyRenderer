@@ -26,6 +26,7 @@ public:
     void load_texture(const char* filename, TGAImage &texture);
     color_t get_texture(float u, float v);
     texcoord_t uv(int iface, int nthvert);
+    vec4 norm(int iface, int nthvert);
 };
 
 #endif //__MODEL_H__

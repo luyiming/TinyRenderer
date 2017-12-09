@@ -90,6 +90,11 @@ texcoord_t Model::uv(int iface, int nthvert)
     return m_uv[m_faces[iface][nthvert].uv];
 }
 
+vec4 Model::norm(int iface, int nthvert)
+{
+    return m_norm[m_faces[iface][nthvert].norm];
+}
+
 vec4 Model::get_vertex(int i) {
     return m_vertices[i];
 }

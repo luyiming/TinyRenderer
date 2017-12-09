@@ -46,7 +46,6 @@ public:
     vec4 barycentric(vec4 A, vec4 B, vec4 C, vec4 P);
     void drawTriangle(vec4 v0, vec4 v1, vec4 v2, IShader &shader, float *zbuffer);
     void drawTriangle(vec4 v0, vec4 v1, vec4 v2, color_t color = { 1.0f, 1.0f, 1.0f });
-    vec4 world2screen(vec4 v);
 
     void render() { SDL_GL_SwapWindow(currentWindow); }
 

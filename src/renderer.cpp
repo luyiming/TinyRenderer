@@ -38,6 +38,15 @@ void vec4::homogenize()
     }
 }
 
+vec4 & vec4::operator*=(const float rhs)
+{
+    x *= rhs;
+    y *= rhs;
+    z *= rhs;
+    w *= rhs;
+    return *this;
+}
+
 vec4 & vec4::operator*=(const vec4 & rhs)
 {
     x *= rhs.x;
@@ -52,6 +61,18 @@ vec4 operator+(const vec4 & lhs, const vec4 & rhs)
 }
 
 vec4 operator*(vec4 lhs, const vec4 & rhs)
+{
+    lhs *= rhs;
+    return lhs;
+}
+
+vec4 operator*(const float lhs, vec4 rhs)
+{
+    rhs *= lhs;
+    return rhs;
+}
+
+vec4 operator*(vec4 lhs, const float rhs)
 {
     lhs *= rhs;
     return lhs;
@@ -198,4 +219,18 @@ color_t & color_t::operator*=(const float & f)
     g *= f;
     b *= f;
     return *this;
+}
+
+mat44 viewport(int x, int y, int w, int h)
+{
+    mat44 m;
+    m.set_identity();
+    m.m[0][3] = x + w / 2.f;
+    m.m[1][3] = y + h / 2.f;
+    m.m[2][3] = 255.0f / 2.f;
+
+    m.m[0][0] = w / 2.f;
+    m.m[1][1] = h / 2.f;
+    m.m[2][2] = 255.0f / 2.f;
+    return m;
 }
