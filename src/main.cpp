@@ -2,7 +2,7 @@
 #include "model.h"
 #include "tgaimage.h"
 #include <cstdio>
-
+#include <limits>
 using namespace std;
 
 //const int SCREEN_WIDTH = 640;
@@ -204,7 +204,6 @@ int main(int argc, char *args[]) {
                     v = Viewport * v;
                     screen_coords.push_back(v);
                 }
-                printf("\n");
                 if (render_wireframe) {
                     screen->drawLine(screen_coords[0].x, screen_coords[0].y, screen_coords[1].x, screen_coords[1].y);
                     screen->drawLine(screen_coords[1].x, screen_coords[1].y, screen_coords[2].x, screen_coords[2].y);

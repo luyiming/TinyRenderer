@@ -194,10 +194,10 @@ void Screen::drawTriangle(vec4 v0, vec4 v1, vec4 v2, IShader &shader, float *zbu
     float x0 = v0.x, y0 = v0.y;
     float x1 = v1.x, y1 = v1.y;
     float x2 = v2.x, y2 = v2.y;
-    int bx0 = std::lround(max(min(min(v0.x, v1.x), v2.x), 0));
-    int by0 = std::lround(max(min(min(v0.y, v1.y), v2.y), 0));
-    int bx1 = std::lround(min(max(max(v0.x, v1.x), v2.x), screenWidth - 1));
-    int by1 = std::lround(min(max(max(v0.y, v1.y), v2.y), screenHeight - 1));
+    int bx0 = std::lround(max(min(min(v0.x, v1.x), v2.x), 0.0f));
+    int by0 = std::lround(max(min(min(v0.y, v1.y), v2.y), 0.0f));
+    int bx1 = std::lround(min(max(max(v0.x, v1.x), v2.x), (float)screenWidth - 1.0f));
+    int by1 = std::lround(min(max(max(v0.y, v1.y), v2.y), (float)screenHeight - 1.0f));
     for (int x = bx0; x <= bx1; x++) {
         for (int y = by0; y <= by1; y++) {
 
@@ -224,7 +224,7 @@ void Screen::drawTriangle(vec4 v0, vec4 v1, vec4 v2, IShader &shader, float *zbu
 
 void Screen::drawTriangle(vec4 v0, vec4 v1, vec4 v2, color_t color)
 {
-    // É¨ÃèÏßËã·¨
+    // É¨ï¿½ï¿½ï¿½ï¿½ï¿½ã·¨
     int x0 = std::lround(v0.x), y0 = std::lround(v0.y);
     int x1 = std::lround(v1.x), y1 = std::lround(v1.y);
     int x2 = std::lround(v2.x), y2 = std::lround(v2.y);
@@ -244,7 +244,7 @@ void Screen::drawTriangle(vec4 v0, vec4 v1, vec4 v2, color_t color)
     float k02 = (float)(x2 - x0) / (y2 - y0);
     if (y0 != y1) {
         float k01 = (float)(x1 - x0) / (y1 - y0);
-        // Ìî³äÏÂÈý½ÇÐÎ
+        // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
         for (int y = y0; y < y1; y++) {
             int xstart = (int)(k02*(y - y0) + x0);
             int xstop = (int)(k01*(y - y0) + x0);
@@ -255,7 +255,7 @@ void Screen::drawTriangle(vec4 v0, vec4 v1, vec4 v2, color_t color)
         }
     }
     if (y1 != y2) {
-        // Ìî³äÉÏÈý½ÇÐÎ
+        // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
         float k12 = (float)(x2 - x1) / (y2 - y1);
         for (int y = y1; y <= y2; y++) {
             int xstart = (int)(k02*(y - y0) + x0);

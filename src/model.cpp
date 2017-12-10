@@ -3,6 +3,7 @@
 #include <fstream>
 #include <sstream>
 #include <vector>
+#include <cmath>
 #include "model.h"
 
 Model::Model(const char *model_file, const char* diffuse_map) {
