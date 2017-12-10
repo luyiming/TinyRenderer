@@ -10,10 +10,12 @@ struct color_t {
     color_t() :r(1.0f), g(1.0f), b(1.0f) {}
     color_t(float r, float g, float b) :r(r), g(g), b(b) {}
     color_t& operator *= (const float &f);
+    color_t& operator += (const color_t &rhs);
 };
 
 color_t operator * (color_t color, float f);
 color_t operator * (float f, color_t color);
+color_t operator + (color_t lhs, const color_t& rhs);
 
 struct texcoord_t { 
     float u, v; 

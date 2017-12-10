@@ -17,11 +17,25 @@ color_t operator*(float f, color_t color)
     return color * f;
 }
 
+color_t operator+(color_t lhs, const color_t & rhs)
+{
+    lhs += rhs;
+    return lhs;
+}
+
 color_t & color_t::operator*=(const float & f)
 {
     r *= f;
     g *= f;
     b *= f;
+    return *this;
+}
+
+color_t & color_t::operator+=(const color_t & rhs)
+{
+    r += rhs.r;
+    g += rhs.g;
+    b += rhs.b;
     return *this;
 }
 
