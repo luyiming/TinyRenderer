@@ -31,13 +31,13 @@ struct BoxShader : public IShader {
         { 0.2f, 1.0f, 0.3f }
     };
 
-    vector<vector<int>> faces = { 
+    vector<vector<int>> faces = {
         {0,1,3},{1,2,3},
         {2,6,7},{2,7,3},
         {6,7,4},{4,5,6},
         {0,5,1},{0,4,5},
         {0,7,4},{0,3,7},
-        {1,5,2},{2,5,6} 
+        {1,5,2},{2,5,6}
     };
     vec4 world_coords[3];
     color_t cur_colors[3];
@@ -100,13 +100,18 @@ struct TextureShader : public IShader {
 int main(int argc, char *args[]) {
     Screen *screen = new Screen(SCREEN_WIDTH, SCREEN_HEIGHT, "TinyRenderer");
     screen->Init();
+    cout << "键盘数字键 1： 切换正方体模型" << endl;
+    cout << "键盘数字键 2： 切换人脸模型" << endl;
+    cout << "鼠标右键拖动： 改变摄像机方位" << endl;
+    cout << "空格键： 切换正方体线框模型" << endl;
 
-    Model model("D:/Projects/TinyRenderer/src/model/african_head.obj",
-        "D:/Projects/TinyRenderer/src/model/african_head_diffuse.tga");
+    Model model("model/african_head.obj",
+        "model/african_head_diffuse.tga");
 
-    //LightShader shader(model);
-    //TextureShader shader(model);
-    BoxShader shader;
+    // LightShader shader(model);
+    TextureShader tex_shader(model);
+    BoxShader box_shader;
+    bool useBox = false;
 
     // Main loop flag
     bool quit = false;
@@ -149,6 +154,14 @@ int main(int argc, char *args[]) {
                     printf("radius at %f\n", beta);
                     redraw = true;
                 }
+                else if (e.key.keysym.sym == SDLK_1) {
+                    useBox = true;
+                    redraw = true;
+                }
+                else if (e.key.keysym.sym == SDLK_2) {
+                    useBox = false;
+                    redraw = true;
+                }
             }
             else if (e.type == SDL_MOUSEMOTION) {
                 if ((SDL_GetModState() & KMOD_ALT) && (e.motion.state & SDL_BUTTON(SDL_BUTTON_LEFT))) {
@@ -176,44 +189,49 @@ int main(int argc, char *args[]) {
             float *zbuffer = new float[SCREEN_HEIGHT * SCREEN_WIDTH];
             for (int i = 0; i < SCREEN_HEIGHT * SCREEN_WIDTH; i++) zbuffer[i] = -std::numeric_limits<float>::max();
 
-            //for (int i = 0; i < model.num_faces(); i++) {
-            //    std::vector<vertex_t> vertices = model.get_face(i);
-            //    std::vector<vec4> screen_coords;
-            //    for (int j = 0; j < (int)vertices.size(); j++) {
-            //        vec4 v = (Projection * ModelView * vertices[j].pos).homogenize();
-            //        if (clip_vertices(v) == true)
-            //            goto stop;
-            //        v = Viewport * v;
-            //        screen_coords.push_back(v);
-            //        shader.varying_norm[j] = vertices[j].norm;
-            //        shader.varying_uv[j] = vertices[j].tex;
-            //    }
-
-            //    screen->drawTriangle(screen_coords[0], screen_coords[1], screen_coords[2], shader, zbuffer);
-            //stop:;
-            //}
-            for (int i = 0; i < shader.faces.size(); i++) {
-                std::vector<vec4> screen_coords;
-                mat44 Projection = ortho(-2, 2, 2, -2, 2, -2);
-                for (int j = 0; j < shader.faces[i].size(); j++) {
-                    shader.world_coords[j] = shader.mesh[shader.faces[i][j]];
-                    shader.cur_colors[j] = shader.colors[shader.faces[i][j]];
-                    vec4 v = (Projection * ModelView * shader.world_coords[j]);
-                    if (clip_vertices(v) == true)
-                        goto stop;
-                    v = Viewport * v;
-                    screen_coords.push_back(v);
+            if (useBox) {
+                for (int i = 0; i < box_shader.faces.size(); i++) {
+                    std::vector<vec4> screen_coords;
+                    mat44 Projection = ortho(-2, 2, 2, -2, 2, -2);
+                    for (int j = 0; j < box_shader.faces[i].size(); j++) {
+                        box_shader.world_coords[j] = box_shader.mesh[box_shader.faces[i][j]];
+                        box_shader.cur_colors[j] = box_shader.colors[box_shader.faces[i][j]];
+                        vec4 v = (Projection * ModelView * box_shader.world_coords[j]);
+                        if (clip_vertices(v) == true)
+                            goto stop1;
+                        v = Viewport * v;
+                        screen_coords.push_back(v);
+                    }
+                    if (render_wireframe) {
+                        screen->drawLine(screen_coords[0].x, screen_coords[0].y, screen_coords[1].x, screen_coords[1].y);
+                        screen->drawLine(screen_coords[1].x, screen_coords[1].y, screen_coords[2].x, screen_coords[2].y);
+                        screen->drawLine(screen_coords[2].x, screen_coords[2].y, screen_coords[0].x, screen_coords[0].y);
+                    }
+                    else {
+                        screen->drawTriangle(screen_coords[0], screen_coords[1], screen_coords[2], box_shader, zbuffer);
+                    }
+                stop1:;
                 }
-                if (render_wireframe) {
-                    screen->drawLine(screen_coords[0].x, screen_coords[0].y, screen_coords[1].x, screen_coords[1].y);
-                    screen->drawLine(screen_coords[1].x, screen_coords[1].y, screen_coords[2].x, screen_coords[2].y);
-                    screen->drawLine(screen_coords[2].x, screen_coords[2].y, screen_coords[0].x, screen_coords[0].y);
-                }
-                else {
-                    screen->drawTriangle(screen_coords[0], screen_coords[1], screen_coords[2], shader, zbuffer);
-                }
-            stop:;
             }
+            else {
+                for (int i = 0; i < model.num_faces(); i++) {
+                    std::vector<vertex_t> vertices = model.get_face(i);
+                    std::vector<vec4> screen_coords;
+                    for (int j = 0; j < (int)vertices.size(); j++) {
+                        vec4 v = (Projection * ModelView * vertices[j].pos).homogenize();
+                        if (clip_vertices(v) == true)
+                            goto stop2;
+                        v = Viewport * v;
+                        screen_coords.push_back(v);
+                        tex_shader.varying_norm[j] = vertices[j].norm;
+                        tex_shader.varying_uv[j] = vertices[j].tex;
+                    }
+
+                    screen->drawTriangle(screen_coords[0], screen_coords[1], screen_coords[2], tex_shader, zbuffer);
+                stop2:;
+                }
+            }
+
 
             screen->render();
             redraw = false;
