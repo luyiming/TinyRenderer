@@ -5,6 +5,8 @@
 * Platform: Windows/Linux
 
 # Screenshots
+![](figure/box_color.png)
+![](figure/box_wireframe.png)
 ![](figure/front_head_light.png)
 ![](figure/front_head_diffuse_texture.png)
 
